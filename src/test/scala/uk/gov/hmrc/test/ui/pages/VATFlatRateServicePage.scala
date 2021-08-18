@@ -43,7 +43,11 @@ object VATFlatRateServicePage extends BasePage {
 
   def goToVATFlatRateService(implicit driver: WebDriver): Unit = {
     go to VATFlatRateServicePage
-    pageTitle shouldBe vatReturnPeriodPageTitle
+
+    if (pageTitle != vatReturnPeriodPageTitle)
+      throw PageNotFoundException(
+        s"goToVATFlatRateService: Expected '$vatReturnPeriodPageTitle' page, but found '$pageTitle' page."
+      )
   }
 
   def provideVATInformation(period: String, turnoverAmount: String, costOfGoodsAmount: String)(implicit
@@ -55,11 +59,19 @@ object VATFlatRateServicePage extends BasePage {
     }
 
     click on continueButton
-    pageTitle shouldBe turnoverPageTitle
+
+    if (pageTitle != turnoverPageTitle)
+      throw PageNotFoundException(
+        s"provideVATInformation: Expected '$turnoverPageTitle' page, but found '$pageTitle' page."
+      )
 
     enterTurnoverAmount(turnoverAmount)
     click on continueButton
-    pageTitle shouldBe costOfGoodsPageTitle
+
+    if (pageTitle != costOfGoodsPageTitle)
+      throw PageNotFoundException(
+        s"provideVATInformation: Expected '$costOfGoodsPageTitle' page, but found '$pageTitle' page."
+      )
 
     enterCostOfGoodsAmount(costOfGoodsAmount)
   }
@@ -70,12 +82,18 @@ object VATFlatRateServicePage extends BasePage {
   def enterCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): Unit =
     textField(costOfGoodsInput).value = amount
 
-  def submitVATInformation(implicit driver: WebDriver): Unit = {
+  def submitVATInformation(implicit driver: WebDriver): Unit =
     click on continueButton
-    pageTitle shouldBe yourVatCalculationPageTitle
+
+  def result(implicit driver: WebDriver): String = {
+    if (pageTitle != yourVatCalculationPageTitle)
+      throw PageNotFoundException(
+        s"result: Expected '$yourVatCalculationPageTitle' page, but found '$pageTitle' page."
+      )
+
+    id(resultOutcome).element.text
   }
 
-  def result(implicit driver: WebDriver): String =
-    id("resultOutcome").element.text
-
 }
+
+case class PageNotFoundException(s: String) extends Exception(s)
