@@ -16,43 +16,66 @@
 
 package uk.gov.hmrc.test.ui.specs
 
-import uk.gov.hmrc.test.ui.pages.HomePage
-import uk.gov.hmrc.test.ui.specs.tags.ZapTests
+import uk.gov.hmrc.test.ui.pages.VATFlatRateServicePage._
 
 class ExampleSpec extends BaseSpec {
 
   Feature("Examples") {
 
-    Scenario("Example Journey With Error Pages", ZapTests) {
+    Scenario("User is a limited cost business that pays annually and should use the 16.5% flat rate") {
+      Given("I am on the Check your VAT flat rate service")
+      goToVATFlatRateService
 
-      Given("Example page is loaded")
+      And("my costs of goods are under £1000 for the year")
+      provideVATInformation("Annually", "1000", "999")
 
-      go to HomePage
-      pageTitle shouldBe HomePage.title
+      When("I submit my VAT information")
+      submitVATInformation
 
-      When("Click continue without selecting vat return period should return an error")
-      pageTitle                                should be("Enter your VAT return details")
-      click on "continue-button"
-      id("error-summary-heading").element.text should be("There are errors on this page")
-
-      Then("Select VAT return period and click continue should go to the next page")
-      click on "vatReturnPeriod-annually"
-      click on "continue-button"
-      pageTitle should be("Enter your turnover")
-
-      When("Click continue without entering amount return an error summary")
-      click on "continue-button"
-      id("error-summary-heading").element.text should be("There are errors on this page")
-
-      When("Enter an amount and click continue")
-      textField("turnover").value = "1000"
-      click on "continue-button"
-      pageTitle should be("Enter your cost of goods")
-
-      When("Click continue without entering cost should return an error summary")
-      click on "continue-button"
-      id("error-summary-heading").element.text should be("There are errors on this page")
+      Then("I will be asked to use the 16.5% VAT flat rate")
+      result should be(setVATFlatRate)
     }
 
+    Scenario("User is not a limited cost business that pays annually and should use the VAT flat rate") {
+      Given("I am on the Check your VAT flat rate service")
+      goToVATFlatRateService
+
+      And("my cost of goods are over £1000 for the year")
+      provideVATInformation("Annually", "1000", "1000")
+
+      When("I submit my VAT information")
+      submitVATInformation
+
+      Then("I will be asked to use the VAT flat rate")
+      result should be(uniqueVATFlatRate)
+    }
+
+    Scenario("User is a limited cost business that pays quarterly and should use the 16.5% flat rate") {
+      Given("I am on the Check your VAT flat rate service")
+      goToVATFlatRateService
+
+      And("my costs of goods are under £250 for the quarter")
+      provideVATInformation("Quarterly", "1000", "249")
+
+      When("I submit my VAT information ")
+      submitVATInformation
+
+      Then("I will be asked to use the 16.5% VAT flat rate for my business type")
+      result should be(setVATFlatRate)
+    }
+
+    Scenario("User is not a limited cost business that pays quarterly and should use the VAT flat rate") {
+      Given("I am on the Check your VAT flat rate service")
+      goToVATFlatRateService
+
+      And("my cost of goods are over £250 for the quarter")
+      provideVATInformation("Quarterly", "1000", "250")
+
+      When("I submit my VAT information ")
+      submitVATInformation
+
+      Then("I will be asked to use the VAT flat rate for my business type")
+      result should be(uniqueVATFlatRate)
+    }
   }
 }
