@@ -60,7 +60,7 @@ class ExampleSpec extends BaseSpec {
       When("I submit my VAT information")
       submitVATInformation
 
-      Then("I will be asked to use the 16.5% VAT flat rate for my business type")
+      Then("I will be asked to use the 16.5% VAT flat rate")
       result should be(setVATFlatRate)
     }
 
@@ -74,7 +74,7 @@ class ExampleSpec extends BaseSpec {
       When("I submit my VAT information")
       submitVATInformation
 
-      Then("I will be asked to use the VAT flat rate for my business type")
+      Then("I will be asked to use the VAT flat rate")
       result should be(uniqueVATFlatRate)
     }
   }
