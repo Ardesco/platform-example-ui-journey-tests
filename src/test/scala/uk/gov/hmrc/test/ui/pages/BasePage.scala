@@ -24,3 +24,5 @@ trait BasePage extends Matchers with Page with WebBrowser {
   val url: String
 
 }
+
+case class PageNotFoundException(s: String) extends Exception(s)

@@ -57,7 +57,7 @@ class ExampleSpec extends BaseSpec {
       And("my costs of goods are under £250 for the quarter")
       provideVATInformation("Quarterly", "1000", "249")
 
-      When("I submit my VAT information ")
+      When("I submit my VAT information")
       submitVATInformation
 
       Then("I will be asked to use the 16.5% VAT flat rate for my business type")
@@ -71,7 +71,7 @@ class ExampleSpec extends BaseSpec {
       And("my cost of goods are over £250 for the quarter")
       provideVATInformation("Quarterly", "1000", "250")
 
-      When("I submit my VAT information ")
+      When("I submit my VAT information")
       submitVATInformation
 
       Then("I will be asked to use the VAT flat rate for my business type")

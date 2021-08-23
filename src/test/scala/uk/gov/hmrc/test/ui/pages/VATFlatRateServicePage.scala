@@ -95,5 +95,3 @@ object VATFlatRateServicePage extends BasePage {
   }
 
 }
-
-case class PageNotFoundException(s: String) extends Exception(s)
