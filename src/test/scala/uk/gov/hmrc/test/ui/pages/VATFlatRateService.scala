@@ -41,16 +41,17 @@ object VATFlatRateService extends BasePage {
   val useSetVATFlatRate    = "Use the 16.5% VAT flat rate"
   val useUniqueVATFlatRate = "Use the VAT flat rate for your business type"
 
-  def goToVATFlatRateService(implicit driver: WebDriver): Unit = {
+  def goToVATFlatRateService(implicit driver: WebDriver): this.type = {
     driver.navigate().to(url)
 
     if (driver.getTitle != vatReturnPeriodPageTitle)
       throw PageNotFoundException(
         s"goToVATFlatRateService: Expected '$vatReturnPeriodPageTitle' page, but found '$driver.getTitle' page."
       )
+    this
   }
 
-  def provideVATPeriod(period: String)(implicit driver: WebDriver): VATFlatRateService.type = {
+  def provideVATPeriod(period: String)(implicit driver: WebDriver): this.type = {
     period match {
       case "Annually" => driver.findElement(By.id(annuallyRadioButton)).click()
       case _          => driver.findElement(By.id(quarterlyRadioButton)).click()
@@ -60,7 +61,7 @@ object VATFlatRateService extends BasePage {
     this
   }
 
-  def provideTurnoverAmount(amount: String)(implicit driver: WebDriver): VATFlatRateService.type = {
+  def provideTurnoverAmount(amount: String)(implicit driver: WebDriver): this.type = {
     if (driver.getTitle != turnoverPageTitle)
       throw PageNotFoundException(
         s"provideVATInformation: Expected '$turnoverPageTitle' page, but found '$driver.getTitle' page."
@@ -68,11 +69,10 @@ object VATFlatRateService extends BasePage {
 
     enterTurnoverAmount(amount)
     driver.findElement(By.id(continueButton)).click()
-
     this
   }
 
-  def provideCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): VATFlatRateService.type = {
+  def provideCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): this.type = {
     if (driver.getTitle != costOfGoodsPageTitle)
       throw PageNotFoundException(
         s"provideVATInformation: Expected '$costOfGoodsPageTitle' page, but found '$driver.getTitle' page."
@@ -82,14 +82,20 @@ object VATFlatRateService extends BasePage {
     this
   }
 
-  def enterTurnoverAmount(amount: String)(implicit driver: WebDriver): Unit =
+  def enterTurnoverAmount(amount: String)(implicit driver: WebDriver): this.type = {
     driver.findElement(By.id(turnoverInput)).sendKeys(amount)
+    this
+  }
 
-  def enterCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): Unit =
+  def enterCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): this.type = {
     driver.findElement(By.id(costOfGoodsInput)).sendKeys(amount)
+    this
+  }
 
-  def submitVATInformation(implicit driver: WebDriver): Unit =
+  def submitVATInformation(implicit driver: WebDriver): this.type = {
     driver.findElement(By.id(continueButton)).click()
+    this
+  }
 
   def result(implicit driver: WebDriver): String = {
     if (driver.getTitle != yourVatCalculationPageTitle)
