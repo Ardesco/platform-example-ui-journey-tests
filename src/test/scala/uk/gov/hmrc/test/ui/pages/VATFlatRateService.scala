@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.test.ui.pages
 
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.{By, WebDriver}
 import uk.gov.hmrc.test.ui.conf.TestConfiguration
 
-object VATFlatRateServicePage extends BasePage {
+object VATFlatRateService extends BasePage {
 
   val url: String = TestConfiguration.url("example-frontend") + "/vat-return-period"
   println(s"Url to VAT flat rate service is: $url")
@@ -37,61 +37,66 @@ object VATFlatRateServicePage extends BasePage {
 
   val continueButton = "continue-button"
 
-  val resultOutcome     = "resultOutcome"
-  val setVATFlatRate    = "Use the 16.5% VAT flat rate"
-  val uniqueVATFlatRate = "Use the VAT flat rate for your business type"
+  val resultOutcome        = "resultOutcome"
+  val useSetVATFlatRate    = "Use the 16.5% VAT flat rate"
+  val useUniqueVATFlatRate = "Use the VAT flat rate for your business type"
 
   def goToVATFlatRateService(implicit driver: WebDriver): Unit = {
-    go to VATFlatRateServicePage
+    driver.navigate().to(url)
 
-    if (pageTitle != vatReturnPeriodPageTitle)
+    if (driver.getTitle != vatReturnPeriodPageTitle)
       throw PageNotFoundException(
-        s"goToVATFlatRateService: Expected '$vatReturnPeriodPageTitle' page, but found '$pageTitle' page."
+        s"goToVATFlatRateService: Expected '$vatReturnPeriodPageTitle' page, but found '$driver.getTitle' page."
       )
   }
 
-  def provideVATInformation(period: String, turnoverAmount: String, costOfGoodsAmount: String)(implicit
-    driver: WebDriver
-  ): Unit = {
+  def provideVATPeriod(period: String)(implicit driver: WebDriver): VATFlatRateService.type = {
     period match {
-      case "Annually" => click on annuallyRadioButton
-      case _          => click on quarterlyRadioButton
+      case "Annually" => driver.findElement(By.id(annuallyRadioButton)).click()
+      case _          => driver.findElement(By.id(quarterlyRadioButton)).click()
     }
 
-    click on continueButton
+    driver.findElement(By.id(continueButton)).click()
+    this
+  }
 
-    if (pageTitle != turnoverPageTitle)
+  def provideTurnoverAmount(amount: String)(implicit driver: WebDriver): VATFlatRateService.type = {
+    if (driver.getTitle != turnoverPageTitle)
       throw PageNotFoundException(
-        s"provideVATInformation: Expected '$turnoverPageTitle' page, but found '$pageTitle' page."
+        s"provideVATInformation: Expected '$turnoverPageTitle' page, but found '$driver.getTitle' page."
       )
 
-    enterTurnoverAmount(turnoverAmount)
-    click on continueButton
+    enterTurnoverAmount(amount)
+    driver.findElement(By.id(continueButton)).click()
 
-    if (pageTitle != costOfGoodsPageTitle)
+    this
+  }
+
+  def provideCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): VATFlatRateService.type = {
+    if (driver.getTitle != costOfGoodsPageTitle)
       throw PageNotFoundException(
-        s"provideVATInformation: Expected '$costOfGoodsPageTitle' page, but found '$pageTitle' page."
+        s"provideVATInformation: Expected '$costOfGoodsPageTitle' page, but found '$driver.getTitle' page."
       )
 
-    enterCostOfGoodsAmount(costOfGoodsAmount)
+    enterCostOfGoodsAmount(amount)
+    this
   }
 
   def enterTurnoverAmount(amount: String)(implicit driver: WebDriver): Unit =
-    textField(turnoverInput).value = amount
+    driver.findElement(By.id(turnoverInput)).sendKeys(amount)
 
   def enterCostOfGoodsAmount(amount: String)(implicit driver: WebDriver): Unit =
-    textField(costOfGoodsInput).value = amount
+    driver.findElement(By.id(costOfGoodsInput)).sendKeys(amount)
 
   def submitVATInformation(implicit driver: WebDriver): Unit =
-    click on continueButton
+    driver.findElement(By.id(continueButton)).click()
 
   def result(implicit driver: WebDriver): String = {
-    if (pageTitle != yourVatCalculationPageTitle)
+    if (driver.getTitle != yourVatCalculationPageTitle)
       throw PageNotFoundException(
-        s"result: Expected '$yourVatCalculationPageTitle' page, but found '$pageTitle' page."
+        s"result: Expected '$yourVatCalculationPageTitle' page, but found '$driver.getTitle' page."
       )
 
-    id(resultOutcome).element.text
+    driver.findElement(By.id(resultOutcome)).getText
   }
-
 }

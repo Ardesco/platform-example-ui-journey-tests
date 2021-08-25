@@ -17,12 +17,9 @@
 package uk.gov.hmrc.test.ui.pages
 
 import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.selenium.{Page, WebBrowser}
 
-trait BasePage extends Matchers with Page with WebBrowser {
-
+trait BasePage extends Matchers {
   val url: String
-
 }
 
 case class PageNotFoundException(s: String) extends Exception(s)
