@@ -16,24 +16,29 @@
 
 package uk.gov.hmrc.test.ui.specs
 
-import uk.gov.hmrc.test.ui.pages.VATFlatRateServicePage._
+import uk.gov.hmrc.test.ui.pages.VATFlatRateService._
+import uk.gov.hmrc.test.ui.specs.tags.ZapTests
 
 class ExampleSpec extends BaseSpec {
 
   Feature("Examples") {
 
-    Scenario("User is a limited cost business that pays annually and should use the 16.5% flat rate") {
+    Scenario("User is a limited cost business that pays annually and should use the 16.5% flat rate", ZapTests) {
+      //Remove ZapTests tag if not required
+
       Given("I am on the Check your VAT flat rate service")
       goToVATFlatRateService
 
       And("my costs of goods are under £1000 for the year")
-      provideVATInformation("Annually", "1000", "999")
+      provideVATPeriod("Annually")
+        .provideTurnoverAmount("1000")
+        .provideCostOfGoodsAmount("999")
 
       When("I submit my VAT information")
       submitVATInformation
 
       Then("I will be asked to use the 16.5% VAT flat rate")
-      result should be(setVATFlatRate)
+      result should be(useSetVATFlatRate)
     }
 
     Scenario("User is not a limited cost business that pays annually and should use the VAT flat rate") {
@@ -41,13 +46,15 @@ class ExampleSpec extends BaseSpec {
       goToVATFlatRateService
 
       And("my cost of goods are over £1000 for the year")
-      provideVATInformation("Annually", "1000", "1000")
+      provideVATPeriod("Annually")
+        .provideTurnoverAmount("1000")
+        .provideCostOfGoodsAmount("1000")
 
       When("I submit my VAT information")
       submitVATInformation
 
       Then("I will be asked to use the VAT flat rate")
-      result should be(uniqueVATFlatRate)
+      result should be(useUniqueVATFlatRate)
     }
 
     Scenario("User is a limited cost business that pays quarterly and should use the 16.5% flat rate") {
@@ -55,27 +62,31 @@ class ExampleSpec extends BaseSpec {
       goToVATFlatRateService
 
       And("my costs of goods are under £250 for the quarter")
-      provideVATInformation("Quarterly", "1000", "249")
+      provideVATPeriod("Quarterly")
+        .provideTurnoverAmount("1000")
+        .provideCostOfGoodsAmount("249")
 
-      When("I submit my VAT information ")
+      When("I submit my VAT information")
       submitVATInformation
 
-      Then("I will be asked to use the 16.5% VAT flat rate for my business type")
-      result should be(setVATFlatRate)
+      Then("I will be asked to use the 16.5% VAT flat rate")
+      result should be(useSetVATFlatRate)
     }
 
     Scenario("User is not a limited cost business that pays quarterly and should use the VAT flat rate") {
       Given("I am on the Check your VAT flat rate service")
       goToVATFlatRateService
 
-      And("my cost of goods are over £250 for the quarter")
-      provideVATInformation("Quarterly", "1000", "250")
+      And("my cost of goods are £250 or over for the quarter")
+      provideVATPeriod("Quarterly")
+        .provideTurnoverAmount("1000")
+        .provideCostOfGoodsAmount("250")
 
-      When("I submit my VAT information ")
+      When("I submit my VAT information")
       submitVATInformation
 
-      Then("I will be asked to use the VAT flat rate for my business type")
-      result should be(uniqueVATFlatRate)
+      Then("I will be asked to use the VAT flat rate")
+      result should be(useUniqueVATFlatRate)
     }
   }
 }
